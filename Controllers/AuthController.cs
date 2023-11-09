@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Demo.Models.DTO;
+using Demo.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,8 +16,10 @@ namespace Demo.Controllers
     public class AuthController : Controller
     {
         public readonly UserManager<IdentityUser> userManager ;
-        public AuthController(UserManager<IdentityUser> userManager)
+        public readonly ITokenRepository tokenRepository;
+        public AuthController(UserManager<IdentityUser> userManager, ITokenRepository tokenRepository)
         {
+            this.tokenRepository = tokenRepository;
             this.userManager = userManager;
             
         }
@@ -55,9 +58,20 @@ namespace Demo.Controllers
             var checkPasswordResult =await userManager.CheckPasswordAsync(user,loginRequestDTO.Password);
             if(checkPasswordResult)
             {
-                // Create token
+                //Get roles for this user
+                 var roles= await userManager.GetRolesAsync(user);
+                if(roles!= null)
+                {
+                     // Create token
+                     var jwtToken =  tokenRepository.CreateJWTToken(user, roles.ToList());
+                     var response = new LoginResponseDTO
+                     {
+                        JwtToken= jwtToken
+                     };
+                    return Ok(response);
+                }
+               
                 
-                return Ok();
             }
         }
         return BadRequest("Username or password mismatch");

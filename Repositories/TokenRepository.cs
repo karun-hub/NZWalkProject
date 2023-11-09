@@ -20,6 +20,7 @@ namespace Demo.Repositories
         }
         public string CreateJWTToken(IdentityUser user, List<string> roles)
         {
+            // create claims
             var claims = new List<Claim>();
             claims.Add(new Claim(ClaimValueTypes.Email, user.Email));
             foreach(var role in roles)

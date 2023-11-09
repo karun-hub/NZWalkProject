@@ -14,6 +14,7 @@ namespace Demo.Data
         public  DbSet<Region> Regions { get; set; }
         public DbSet<Walk> Walk { get; set; }
         public DbSet<Demon> demon {get; set;}
+        public DbSet<Image> Images { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AutoMapper;
 using Demo.CustomActionFilters;
 using Demo.Data;
@@ -17,18 +18,23 @@ namespace Demo.Controllers
         private readonly IRegionRepository regionRepository ;
         private readonly IMapper mapper;
         private readonly DemoDbContext dbContext;
-        public RegionController(DemoDbContext dbContext, IRegionRepository regionRepository,IMapper mapper)
+        private readonly ILogger<RegionController> logger;
+        public RegionController(DemoDbContext dbContext, IRegionRepository regionRepository,IMapper mapper, ILogger<RegionController> logger)
         {
+            this.logger = logger;
             this.regionRepository = regionRepository;
             this.mapper = mapper;
             this.dbContext = dbContext;
             
         }
         [HttpGet]
-        [Authorize(Roles ="Writer,Reader")]
+        //[Authorize(Roles ="Writer,Reader")]
         public async Task<IActionResult> GetAll()
         {
+            logger.LogInformation("GetAll Regions Action Method was invoked");
             //Get data from the database
+            logger.LogWarning("This is a warning log hehe");
+            logger.LogError("This is a dummy error hehe");
            var regions= await regionRepository.GetAllAsync();
             // map dmoain model to dto
             // var regionDto= new List<RegionDto>();
@@ -43,6 +49,7 @@ namespace Demo.Controllers
             //     });
             // }
             var regionDto =mapper.Map<List<RegionDto>>(regions);
+            logger.LogInformation($"Fininshed GetAllRegion request with data: {JsonSerializer.Serialize(regions)}");
             // return dto
              return Ok(regionDto);
         }
